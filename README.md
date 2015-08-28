@@ -6,7 +6,7 @@ git clone https://github.com/BenjaminConant/extract.js.git
 npm install
 ```
 
-Usage
+<h3>Usage</h3>
 ```
  node extract.js http://www.google.com
 
