@@ -1,6 +1,6 @@
 This project currently allows you to scrape meta data from a url via a basic CLI
 
-Instalation
+<h3>Instalation</h3>
 ```
 git clone https://github.com/BenjaminConant/extract.js.git
 npm install
