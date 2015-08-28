@@ -11,6 +11,7 @@ request(url).spread(function(response, body) {
     getTitle($, url, output);
     getDescription($, output);
     getFavicon($, url, output);
+    getImages($, output);
     console.log(output);
 }).catch(function(err) {
     console.error(err);
@@ -36,6 +37,20 @@ function getFavicon($, url, output) {
   faviconGuesses = faviconGuesses.filter(function(guess){ return guess; })
   faviconGuesses = faviconGuesses.map(function(guess) { return enforceAbsoluteLink(url, guess) })
   output.favicon = prefrencePngFavicons(faviconGuesses);
+}
+
+function getImages($, output) {
+  var arr = $('#all_imgs img').map(function() { return this.src; }).get()
+  console.log(arr);
+  // var images = $("img");
+  // images = images.map(function(image, index){
+  //   if (image.attribs) { 
+  //     if (image.attribs.attribs) {
+  //       console.log(image.attribs.attribs);
+  //     }
+  //   } 
+  // })
+  // console.log(images.length);
 }
 
 function enforceAbsoluteLink (url, link) {
