@@ -1,9 +1,26 @@
 {
-  "name": "extract.js",
+  "name": "extract",
+  "description": "Get meta data from urls with node.js",
   "version": "1.0.0",
+  "main": "./extract.js",
+  "keywords": [
+    "web scraping",
+    "meta data"
+  ],
   "dependencies": {
     "bluebird": "^2.9.34",
     "cheerio": "^0.19.0",
     "request": "^2.61.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BenjaminConant/extract.js.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Benjamin Conant",
+    "email": "conantbenjamin@gmail.com",
+    "url": "http://github.com/benjaminconant/"
   }
+
 }

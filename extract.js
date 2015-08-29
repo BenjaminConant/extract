@@ -2,20 +2,22 @@ var cheerio = require('cheerio');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 var urlParser = require('url');
-var url = process.argv[2];
 
-request(url).spread(function(response, body) {
-    var output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
-    $ = cheerio.load(body);
-    output.url = url;
-    getTitle($, url, output);
-    getDescription($, output);
-    getFavicon($, url, output);
-    getImages($, output);
-    console.log(output);
-}).catch(function(err) {
-    console.error(err);
-});
+exports.url = function (url) {
+  return request(url).spread(function(response, body) {
+            var output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
+            $ = cheerio.load(body);
+            output.url = url;
+            getTitle($, url, output);
+            getDescription($, output);
+            getFavicon($, url, output);
+            getImages($, output);
+            return output;
+            console.log(output);
+          }).catch(function(err) {
+              console.error(err);
+          });
+}
 
  
 function getTitle ($, url, output) {
@@ -40,17 +42,15 @@ function getFavicon($, url, output) {
 }
 
 function getImages($, output) {
-  var arr = $('#all_imgs img').map(function() { return this.src; }).get()
-  console.log(arr);
-  // var images = $("img");
-  // images = images.map(function(image, index){
-  //   if (image.attribs) { 
-  //     if (image.attribs.attribs) {
-  //       console.log(image.attribs.attribs);
-  //     }
-  //   } 
-  // })
-  // console.log(images.length);
+  var imageArray = []; 
+  var images = $("img");
+  var imageLength = images.length;
+  for ( var i = 0; i < images.length; i++) {
+    if (images[i].attribs.src) {
+      imageArray.push(images[i].attribs.src);
+    }
+  }
+  output.images = imageArray;
 }
 
 function enforceAbsoluteLink (url, link) {
