@@ -6,7 +6,7 @@ Go into your node_modules folder then run
 
 ```
 git clone https://github.com/BenjaminConant/extract.js.git
-cd extract.js
+cd extract
 npm install
 ```
 
