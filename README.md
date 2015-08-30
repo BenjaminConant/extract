@@ -43,7 +43,7 @@ extract.url(url).then(function(res){
 
 
 ```
- node extract.js http://www.google.com
+ node extractTest.js http://www.google.com
 
 =>  { title: 'Google',
 	  description: 'Search the world\'s information, including webpages, images, videos and more. Google has many special features to help you find exactly what you\'re looking for.',
