@@ -29,7 +29,7 @@ exports.cloudinaryConfig = {
 ```
 extractTest.js
 
-var extract = require('extract.js');
+var extract = require('extract');
 var url = process.argv[2];
 
 
