@@ -1,20 +1,38 @@
+var fs = require('fs');
 var cheerio = require('cheerio');
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 var urlParser = require('url');
+var webshot = Promise.promisify(require('webshot'));
+var keys = require('./keys.js')
+var cloudinary = Promise.promisifyAll(require('cloudinary'));
+cloudinary.config(keys.cloudinaryConfig);
+
 
 exports.url = function (url) {
+  var output;
   return request(url).spread(function(response, body) {
-            var output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
+            output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
             $ = cheerio.load(body);
             output.url = url;
             getTitle($, url, output);
             getDescription($, output);
             getFavicon($, url, output);
-            getImages($, output);
-            return output;
+            getImages($, output, url);
+            
+          })
+          .then(function(output){
+            return webshot(url, 'frog.png');
+          })
+          .then(function(data) {
+            return cloudinary.uploader.upload("frog.png");
+          })
+          .then(function(data){
+            output.images.unshift(data.url);
+            fs.unlinkSync("frog.png");
             console.log(output);
-          }).catch(function(err) {
+          })
+          .catch(function(err) {
               console.error(err);
           });
 }
@@ -41,13 +59,20 @@ function getFavicon($, url, output) {
   output.favicon = prefrencePngFavicons(faviconGuesses);
 }
 
-function getImages($, output) {
+function getImages($, output, url) {
   var imageArray = []; 
+
+  // webshot(url, 'google.png', function(err) {
+  // // screenshot now saved to google.png 
+  // });
+
+
   var images = $("img");
   var imageLength = images.length;
   for ( var i = 0; i < images.length; i++) {
     if (images[i].attribs.src) {
-      imageArray.push(images[i].attribs.src);
+      var image = enforceAbsoluteLink(url, images[i].attribs.src) 
+      imageArray.push(image);
     }
   }
   output.images = imageArray;
