@@ -11,7 +11,8 @@ cloudinary.config(keys.cloudinaryConfig);
 
 exports.url = function (url) {
   var output;
-  return request(url).spread(function(response, body) {
+  return request(url)
+          .spread(function(response, body) {
             output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
             $ = cheerio.load(body);
             output.url = url;
@@ -19,7 +20,6 @@ exports.url = function (url) {
             getDescription($, output);
             getFavicon($, url, output);
             getImages($, output, url);
-            
           })
           .then(function(output){
             return webshot(url, 'frog.png');
@@ -61,12 +61,6 @@ function getFavicon($, url, output) {
 
 function getImages($, output, url) {
   var imageArray = []; 
-
-  // webshot(url, 'google.png', function(err) {
-  // // screenshot now saved to google.png 
-  // });
-
-
   var images = $("img");
   var imageLength = images.length;
   for ( var i = 0; i < images.length; i++) {
