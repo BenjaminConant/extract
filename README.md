@@ -1,8 +1,12 @@
 This project currently allows you to scrape meta data from a url via a basic CLI
 
 <h3>Instalation</h3>
+
+Go into your node_modules folder then run
+
 ```
 git clone https://github.com/BenjaminConant/extract.js.git
+cd extract.js
 npm install
 ```
 
@@ -21,6 +25,23 @@ exports.cloudinaryConfig = {
 
 
 <h3>Usage</h3>
+
+```
+extractTest.js
+
+var extract = require('extract.js');
+var url = process.argv[2];
+
+
+extract.url(url).then(function(res){
+	console.log(res);
+})
+
+```
+
+
+
+
 ```
  node extract.js http://www.google.com
 
