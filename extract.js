@@ -9,13 +9,16 @@ var cloudinary = Promise.promisifyAll(require('cloudinary'));
 cloudinary.config(keys.cloudinaryConfig);
 
 
+// Todo ... refactor get favicon and get images in to single promise returning functions.
+
+
 exports.url = function (url) {
   var output;
   return request(url)
           .spread(function(response, body) {
             output = { 'title': undefined, 'description': undefined, 'favicon': undefined, 'images': [], 'url': undefined };
             $ = cheerio.load(body);
-            output.url = url;
+            getUrl($, url, output);
             getTitle($, url, output);
             getDescription($, output);
             getFavicon($, url, output);
@@ -31,21 +34,40 @@ exports.url = function (url) {
             output.images.unshift(data.url);
             fs.unlinkSync("frog.png");
             console.log(output);
+            return request('https://www.googfdsafdsafdsale.com/favicon.ico')
+          })
+          .then(function(res){
+            console.log(res);
           })
           .catch(function(err) {
               console.error(err);
           });
 }
 
- 
+
 function getTitle ($, url, output) {
-  output.title = urlParser.parse(url).hostname;
-  output.title = $('title').text();
+  var possibleTitles = [ 
+                         urlParser.parse(url).hostname,
+                         $('title').text(),
+                         $("meta[property='og:title']").attr('content')
+                        ]
+  output.title = triageOptions(possibleTitles);                 
+}
+
+function getUrl ($, url, output) {
+  var possibleUrls = [ 
+                       url,
+                       $("meta[property='og:url']").attr('content')
+                      ]
+  output.url = triageOptions(possibleUrls);                 
 }
 
 function getDescription($, output) {
-  // TODO ... will .attrfail of $("meta[name='description']") is empty?
-  output.description = $("meta[name='description']").attr('content');
+  var possibleDescriptions = [
+                               $("meta[property='og:description']").attr('content'),
+                               $("meta[name='description']").attr('content')
+                              ]
+  output.description = triageOptions(possibleDescriptions);   
 }
 
 
@@ -60,13 +82,15 @@ function getFavicon($, url, output) {
 }
 
 function getImages($, output, url) {
-  var imageArray = []; 
+  var imageArray = [];
+  var openGraphImage = $("meta[property='og:image']").attr('content');
+  if (openGraphImage) {imageArray.push(enforceAbsoluteLink(url, openGraphImage))};
   var images = $("img");
   var imageLength = images.length;
   for ( var i = 0; i < images.length; i++) {
     if (images[i].attribs.src) {
-      var image = enforceAbsoluteLink(url, images[i].attribs.src) 
-      imageArray.push(image);
+      var image = enforceAbsoluteLink(url, images[i].attribs.src)
+      if (image !== imageArray[0]) { imageArray.push(image) };
     }
   }
   output.images = imageArray;
@@ -90,3 +114,12 @@ function prefrencePngFavicons (links) {
   }
   return links[0];
 }
+
+function triageOptions (options) {
+  var best;
+  options.forEach(function(option) {
+   if (option) { best = option; }
+  });
+  return best
+}
+
